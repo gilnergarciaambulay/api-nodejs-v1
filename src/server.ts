@@ -56,6 +56,7 @@ if (objL_HorasLogger >= objL_HoraInicio || objL_HorasLogger <= objL_HoraFin) {
 objL_app.use('/api/user',                   require('./routes/usuario.route'))
 objL_app.use('/api/reportes',               require('./routes/reportes.route'));
 objL_app.use('/api/pedidos',               require('./routes/pedidos.route'));
+objL_app.use('/api/ubigeo',               require('./routes/ubigeo.route'));
 /**
  * Guarda los errores que se generen en el sistema en un archivo log por fecha
  * @date 24/09/2021 
