@@ -265,7 +265,7 @@ class PedidosController {
                 .request()
                 .query(`ERP_GET_PED_READ_ERP_VEN_MEDIOPAGO`)
             res.json({
-                message: "Lista de alertas",
+                message: "Lista de ERP_VEN_MEDIOPAGO",
                 resultado: objL_query.recordset,
                 confirmacion: true
             })
@@ -288,6 +288,68 @@ class PedidosController {
             }
         }
     }
+
+    public asyMtd_GetCondicionPago = async (req: Request, res: Response) => {
+        try {
+            const objL_Conn = await obPt_SQLServerNode.asyM_ConnexionSQL()
+            const objL_query = await objL_Conn!
+                .request()
+                .query(`ERP_GET_PED_READ_ERP_LOG_CONPAG`)
+            res.json({
+                message: "Lista ERP_LOG_CONPAG",
+                resultado: objL_query.recordset,
+                confirmacion: true
+            })
+        } catch (error: any) {
+            if (instanceOfNodeError(error, sql.RequestError)) {
+                return res.status(200).json({
+                    message: error.originalError?.message,
+                    confirmacion: false
+                })
+            } else if (instanceOfNodeError(error, sql.ConnectionError)) {
+                return res.status(200).json({
+                    message: error.message,
+                    confirmacion: false
+                })
+            } else if (instanceOfNodeError(error, Error)) {
+                return res.status(200).json({
+                    message: error.message,
+                    confirmacion: false
+                })
+            }
+        }
+    }  
+    
+    public asyMtd_GetMoneda = async (req: Request, res: Response) => {
+        try {
+            const objL_Conn = await obPt_SQLServerNode.asyM_ConnexionSQL()
+            const objL_query = await objL_Conn!
+                .request()
+                .query(`ERP_GET_PED_READ_ERP_LOG_MONEDA`)
+            res.json({
+                message: "Lista ERP_LOG_MONEDA",
+                resultado: objL_query.recordset,
+                confirmacion: true
+            })
+        } catch (error: any) {
+            if (instanceOfNodeError(error, sql.RequestError)) {
+                return res.status(200).json({
+                    message: error.originalError?.message,
+                    confirmacion: false
+                })
+            } else if (instanceOfNodeError(error, sql.ConnectionError)) {
+                return res.status(200).json({
+                    message: error.message,
+                    confirmacion: false
+                })
+            } else if (instanceOfNodeError(error, Error)) {
+                return res.status(200).json({
+                    message: error.message,
+                    confirmacion: false
+                })
+            }
+        }
+    }    
 
     public asyMtd_GetTipoTransporte = async (req: Request, res: Response) => {
         try {
@@ -365,10 +427,29 @@ class PedidosController {
                         <UnidadMedida>${item.UnidadMedida}</UnidadMedida>
                         <Cantidad>${item.Cantidad}</Cantidad>
                         <PrecioUnitario>${item.PrecioUnitario}</PrecioUnitario>
+                        <CodMoneda>${item.CodMoneda}</CodMoneda>
                     </Detalle>`).join("") +
                 `</XML>`;
 
-            /*    console.log(xmlDetalle); */
+                console.log(xmlDetalle); 
+                console.log(`
+                CodEmpresa: ${pedido.CodEmpresa}
+                CodCliente: ${pedido.CodCliente}
+                CodVia: ${pedido.CodVia}
+                CodProveedor: ${pedido.CodProveedor}
+                DirProveedor2: ${pedido.DirProveedor2}
+                EstadoPedido: ${pedido.EstadoPedido}
+                NroDocDestino: ${pedido.NroDocDestino}
+                NombreDestino: ${pedido.NombreDestino}
+                NotasDestino: ${pedido.NotasDestino}
+                CodTipoComprobante: ${pedido.CodTipoComprobante}
+                CodMedioPago: ${pedido.CodMedioPago}
+                ArchivoComprobante: ${pedido.ArchivoComprobante}
+                NotasPedido: ${pedido.NotasPedido}
+                UsrCre: ${pedido.UsrCre}
+                WksCre: ${pedido.WksCre}
+                `);
+
 
             const request = pool!.request();
             request
@@ -382,9 +463,13 @@ class PedidosController {
                                 .input("PrecioTotal", sql.Decimal(10, 2), pedido.PrecioTotal) */
                 .input("NroDocDestino", sql.VarChar(50), pedido.NroDocDestino)
                 .input("NombreDestino", sql.VarChar(50), pedido.NombreDestino)
+                .input("NotasDestino", sql.VarChar(50), pedido.NotasDestino)
+
                 .input("CodTipoComprobante", sql.Int, pedido.CodTipoComprobante)
                 .input("CodMedioPago", sql.Int, pedido.CodMedioPago)
+                .input("CodConPago", sql.Int, pedido.CodConPago)
                 .input("ArchivoComprobante", sql.VarChar(255), pedido.ArchivoComprobante)
+                
                 .input("NotasPedido", sql.VarChar(250), pedido.NotasPedido)
                 .input("UsrCre", sql.VarChar(250), pedido.UsrCre)
                 .input("WksCre", sql.VarChar(250), pedido.WksCre)
@@ -400,17 +485,20 @@ class PedidosController {
                 confirmacion: true
             });
         } catch (error: any) {
+            console.error('Error en asyMtd_InsertarPedidoCompleto:', error);
             if (instanceOfNodeError(error, sql.RequestError)) {
                 return res.status(200).json({
                     message: error.originalError?.message,
                     confirmacion: false
                 })
             } else if (instanceOfNodeError(error, sql.ConnectionError)) {
+                console.error('Error en asyMtd_InsertarPedidoCompleto:', error);
                 return res.status(200).json({
                     message: error.message,
                     confirmacion: false
                 })
             } else if (instanceOfNodeError(error, Error)) {
+                console.error('Error en asyMtd_InsertarPedidoCompleto:', error);
                 return res.status(200).json({
                     message: error.message,
                     confirmacion: false
